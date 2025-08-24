@@ -1,97 +1,260 @@
+version: '3.8'
+
 services:
-  # Laravel API サーバー
+  # Nginx リバースプロキシ
+  nginx:
+    image: nginx:alpine
+    container_name: webapp_nginx_prod
+    ports:
+      - "80:80"
+      # - "443:443"  # HTTPSは後で有効化
+    volumes:
+      - ./nginx/nginx.ip.conf:/etc/nginx/nginx.conf:ro  # IP用設定使用
+      # - ./nginx/ssl:/etc/nginx/ssl:ro  # SSLは後で設定
+      - ./backend/storage/app/public:/var/www/html/storage/app/public:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - webapp_network
+    restart: unless-stopped
+    # Lightsail $5プラン対応：メモリ制限
+    mem_limit: 64M
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Laravel API サーバー（本番用）
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    container_name: webapp_backend
-    ports:
-      - "8000:8000"
+      dockerfile: Dockerfile.production
+      cache_from:
+        - webapp_backend_prod:latest
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    container_name: webapp_backend_prod
+    # ポートを内部のみに制限（Nginx経由でアクセス）
+    expose:
+      - "9000"
     volumes:
-      - ./backend:/var/www/html
-      - /var/www/html/node_modules
+      # 本番用：バインドマウント削除、必要な永続化のみ
+      - app_storage:/var/www/html/storage
+      - app_bootstrap_cache:/var/www/html/bootstrap/cache
+    env_file:
+      - .env.production
     environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
       - DB_HOST=database
       - DB_PORT=3306
-      - DB_DATABASE=app_dev_db
-      - DB_USERNAME=db_user_dev
-      - DB_PASSWORD=dev_password_change_in_prod
+      - DB_DATABASE=${DB_DATABASE:-fukupochi}
+      - DB_USERNAME=${DB_USERNAME:-fukupochi_user}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - webapp_network
+    restart: unless-stopped
+    # Lightsail $5プラン対応：メモリ制限
+    mem_limit: 256M
+    healthcheck:
+      test: ["CMD", "php", "artisan", "tinker", "--execute=echo 'ok';"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
-  # SvelteKit フロントエンド
+  # SvelteKit フロントエンド（本番用）
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    container_name: webapp_frontend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      dockerfile: Dockerfile.production
+      cache_from:
+        - webapp_frontend_prod:latest
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    container_name: webapp_frontend_prod
+    # ポートを内部のみに制限（Nginx経由でアクセス）
+    expose:
+      - "3000"
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000/api
-      - VITE_API_BASE_URL_SSR=http://backend:8000/api
-      - VITE_APP_ENV=development
+      - NODE_ENV=production
+      - PUBLIC_API_BASE_URL=http://${SERVER_IP}/api
+      - PUBLIC_APP_ENV=production
+      - PUBLIC_APP_NAME=FukuPochi
     depends_on:
       - backend
     networks:
       - webapp_network
+    restart: unless-stopped
+    # Lightsail $5プラン対応：メモリ制限
+    mem_limit: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
-  # MySQL データベース
+  # MySQL データベース（本番用）
   database:
     image: mysql:8.4
-    container_name: webapp_database
-    ports:
-      - "3306:3306"
+    container_name: webapp_database_prod
+    # ポート公開を削除（セキュリティ向上）
+    expose:
+      - "3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: app_dev_db
-      MYSQL_USER: db_user_dev
-      MYSQL_PASSWORD: dev_password_change_in_prod
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE:-fukupochi}
+      MYSQL_USER: ${DB_USERNAME:-fukupochi_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      # 本番用MySQL設定（Lightsail最適化）
+      MYSQL_INNODB_BUFFER_POOL_SIZE: 128M
+      MYSQL_INNODB_LOG_FILE_SIZE: 32M
+      MYSQL_MAX_CONNECTIONS: 50
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./database/init:/docker-entrypoint-initdb.d
+      - mysql_data_prod:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - mysql_logs:/var/log/mysql
+      # 初期化スクリプト（必要に応じて）
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=128M
+      --innodb-log-file-size=32M
+      --max-connections=50
+      --slow-query-log=1
+      --slow-query-log-file=/var/log/mysql/slow.log
+      --long-query-time=2
+    networks:
+      - webapp_network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 30s
       timeout: 10s
       retries: 5
-      interval: 10s
-    networks:
-      - webapp_network
+      start_period: 60s
+    # Lightsail $5プラン対応：メモリ制限（最適化）
+    mem_limit: 256M
 
-  # Redis
+  # Redis（本番用）
   redis:
     image: redis:7-alpine
-    container_name: webapp_redis
-    ports:
-      - "6379:6379"
+    container_name: webapp_redis_prod
+    # ポート公開を削除（セキュリティ向上）
+    expose:
+      - "6379"
     volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
+      - redis_data_prod:/data
+      - redis_logs:/var/log/redis
+      - ./redis/redis.conf:/etc/redis/redis.conf:ro
+    # 本番用Redis設定
+    command: redis-server /etc/redis/redis.conf
     networks:
       - webapp_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    # メモリ制限（VPS環境考慮）
+    mem_limit: 128M
 
-  # Mailpit（開発用メールテスト）
-  mailpit:
-    image: axllent/mailpit:latest
-    container_name: webapp_mailpit
-    ports:
-      - "1025:1025"  # SMTP
-      - "8025:8025"  # Web UI
+  # 本番用：Cron & Queue Worker
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
+    container_name: webapp_scheduler_prod
+    volumes:
+      - app_storage:/var/www/html/storage
+    env_file:
+      - .env.production
+    environment:
+      - APP_ENV=production
+      - DB_HOST=database
+      - REDIS_HOST=redis
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - webapp_network
+    restart: unless-stopped
+    command: ["php", "artisan", "schedule:work"]
+    # Lightsail $5プラン対応：メモリ制限
+    mem_limit: 64M
 
+  queue_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
+    container_name: webapp_queue_prod
+    volumes:
+      - app_storage:/var/www/html/storage
+    env_file:
+      - .env.production
+    environment:
+      - APP_ENV=production
+      - DB_HOST=database
+      - REDIS_HOST=redis
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - webapp_network
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "--verbose", "--tries=3", "--timeout=90"]
+    # Lightsail $5プラン対応：メモリ制限
+    mem_limit: 128M
+
+# 本番用ボリューム定義
 volumes:
-  mysql_data:
+  # アプリケーション関連
+  app_storage:
     driver: local
-  redis_data:
+  app_bootstrap_cache:
+    driver: local
+  
+  # データベース関連
+  mysql_data_prod:
+    driver: local
+  mysql_logs:
+    driver: local
+  
+  # Redis関連
+  redis_data_prod:
+    driver: local
+  redis_logs:
+    driver: local
+  
+  # Nginx関連
+  nginx_logs:
     driver: local
 
+# 本番用ネットワーク
 networks:
   webapp_network:
     driver: bridge
+    # 内部ネットワーク分離
+    internal: false
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

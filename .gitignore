@@ -73,3 +73,26 @@ coverage/
 # Temporary folders
 tmp/
 temp/
+
+# Cleanup and debugging files (should not be committed)
+scripts/fix-*.sh
+scripts/debug-*.sh
+scripts/nuclear-*.sh
+scripts/*-error.sh
+scripts/manage-build-cache.sh
+scripts/optimization-guide.sh
+
+# Docker experimental files
+**/Dockerfile.*.optimized
+**/Dockerfile.*.ultra
+**/Dockerfile.*.safe
+**/Dockerfile.*.emergency
+docker/base-images/
+
+# Backup files
+*.backup*
+docker-compose.*.backup*
+.env.*.backup*
+
+# Development docker-compose file
+docker-compose.dev.yml
