@@ -44,11 +44,15 @@
 	}
 	
 	.icon-image {
-		width: 100%;
-		height: 100%;
+		width: 100% !important;
+		height: 100% !important;
 		object-fit: contain;
 		filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1));
 		transition: all 0.2s ease;
+		/* SVGファイル内の固有サイズをオーバーライド */
+		max-width: 100%;
+		max-height: 100%;
+		display: block;
 	}
 	
 	.clothing-icon:hover .icon-image {
@@ -68,6 +72,24 @@
 	@media (max-width: 400px) {
 		.w-12 { width: 2.5rem; }
 		.h-12 { height: 2.5rem; }
+	}
+	
+	/* SVGファイルの固有サイズを完全にオーバーライド */
+	.clothing-icon svg {
+		width: 100% !important;
+		height: 100% !important;
+		max-width: 100% !important;
+		max-height: 100% !important;
+		display: block;
+	}
+	
+	/* 各サイズでSVG要素も統一 */
+	.w-6 svg { width: 1.5rem !important; height: 1.5rem !important; }
+	.w-8 svg { width: 2rem !important; height: 2rem !important; }
+	.w-12 svg { width: 3rem !important; height: 3rem !important; }
+	
+	@media (max-width: 400px) {
+		.w-12 svg { width: 2.5rem !important; height: 2.5rem !important; }
 	}
 	
 	/* アクセシビリティ: reduced motionの場合はアニメーションを無効化 */

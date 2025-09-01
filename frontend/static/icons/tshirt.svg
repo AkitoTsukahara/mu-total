@@ -1,20 +1,17 @@
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(6, 8)">
-    <!-- T-shirt body -->
-    <path d="M8 12 L8 30 C8 31.5 9 32 10 32 L26 32 C27 32 28 31.5 28 30 L28 12" 
-          fill="#faf9f7" stroke="#87ceeb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    
-    <!-- T-shirt sleeves -->
-    <path d="M8 12 L4 14 C3 14.5 3 16.5 4 17 L8 18" 
-          fill="#faf9f7" stroke="#87ceeb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M28 12 L32 14 C33 14.5 33 16.5 32 17 L28 18" 
-          fill="#faf9f7" stroke="#87ceeb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    
-    <!-- Neckline -->
-    <path d="M12 8 C12 6 14 4 18 4 C22 4 24 6 24 8 L24 12 L12 12 Z" 
-          fill="#faf9f7" stroke="#87ceeb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    
-    <!-- Decorative accent -->
-    <circle cx="18" cy="20" r="2" fill="#ffd54f" opacity="0.8"/>
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_レイヤー_1" data-name="レイヤー_1" xmlns="http://www.w3.org/2000/svg" width="300" height="300" version="1.1" viewBox="50 50 200 200">
+  <!-- Generator: Adobe Illustrator 29.0.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 192)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: none;
+        stroke: #333;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 8px;
+      }
+    </style>
+  </defs>
+  <path class="st0" d="M92.79,95.7l-28.42,23.04,22.86,28.2,14.86-12.05-2.89,76.91h101.59l-2.89-76.91,14.86,12.05,22.86-28.2-28.42-23.04c-5.99-4.85-13.46-7.5-21.17-7.5h-13.11c-3.19,9.64-12.22,18.15-22.93,18.15s-19.85-8.51-23.04-18.15h-13c-7.71,0-15.18,2.65-21.17,7.5Z"/>
+  <path class="st0" d="M126.96,88.2c14.92,4.2,30.26,3.99,45.97,0"/>
 </svg>

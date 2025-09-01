@@ -1,21 +1,16 @@
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(8, 8)">
-    <!-- Tank top body -->
-    <path d="M6 8 L6 26 C6 28 7 30 9 30 L23 30 C25 30 26 28 26 26 L26 8" 
-          fill="#faf9f7" stroke="#87ceeb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    
-    <!-- Tank top straps -->
-    <path d="M6 8 C6 6 8 4 10 4 L10 8" 
-          fill="none" stroke="#87ceeb" stroke-width="2" stroke-linecap="round"/>
-    <path d="M26 8 C26 6 24 4 22 4 L22 8" 
-          fill="none" stroke="#87ceeb" stroke-width="2" stroke-linecap="round"/>
-    
-    <!-- Neckline -->
-    <path d="M10 8 C10 6 12 4 16 4 C20 4 22 6 22 8" 
-          fill="none" stroke="#87ceeb" stroke-width="2" stroke-linecap="round"/>
-    
-    <!-- Decorative heart -->
-    <path d="M14 14 C14 12.5 15.5 12 16 13 C16.5 12 18 12.5 18 14 C18 15.5 16 17 16 17 C16 17 14 15.5 14 14 Z" 
-          fill="#ffd54f" opacity="0.8"/>
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_レイヤー_1" data-name="レイヤー_1" xmlns="http://www.w3.org/2000/svg" width="300" height="300" version="1.1" viewBox="50 50 200 200">
+  <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: none;
+        stroke: #333;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 8px;
+      }
+    </style>
+  </defs>
+  <path class="st0" d="M183.97,103.05v-33.44s-17.04,0-17.04,0v21.17c0,9.35-7.58,16.93-16.93,16.93h0c-9.35,0-16.93-7.58-16.93-16.93v-21.17h-17.04v33.44c0,3.73-.31,7.46-1.03,11.12-1.68,8.54-4.76,15.03-14.56,19.43v96.79h99.13v-96.79c-9.81-4.41-12.89-10.9-14.56-19.43-.72-3.66-1.03-7.39-1.03-11.12Z"/>
 </svg>
