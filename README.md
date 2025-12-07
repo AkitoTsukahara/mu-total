@@ -1,80 +1,130 @@
-# ふくぽち (fuku-pochi)
+# mu-total
 
 保育園に預ける子どもの衣類ストック状況を、夫婦で共有しやすく・直感的に管理できるスマホWebアプリです。
 
 ## 技術スタック
 
-- **フロントエンド**: SvelteKit (Node.js 22 LTS)
 - **バックエンド**: Laravel 12.x (PHP 8.4)
 - **データベース**: MySQL 8.4 LTS
-- **テスト**: Vitest (フロントエンド) / PHPUnit (バックエンド)
-- **デプロイ**: Laravel Vapor
-- **コンテナ**: Docker & Docker Compose
+- **テスト**: PHPUnit
+- **フロントエンド**: Vite + Vue/React (Laravel標準構成)
 
 ## 開発環境構築手順
 
 ### 必要な環境
-- Docker & Docker Compose
+- PHP 8.4以上
+- Composer
+- MySQL 8.4 LTS
+- Node.js 22 LTS
 - Git
-- [Task](https://taskfile.dev/) (タスクランナー)
-
-### Taskのインストール
-```bash
-# macOS (Homebrew)
-brew install go-task
-
-# その他のOSはこちら: https://taskfile.dev/installation/
-```
 
 ### クイックスタート
 
-1. **リポジトリのクローンと起動**
+1. **リポジトリのクローン**
 ```bash
-git clone https://github.com/username/fuku-pochi.git
-cd fuku-pochi
-
-# 初期セットアップ & 起動（Taskfileを使用）
-task up
+git clone https://github.com/username/mu-total.git
+cd mu-total
 ```
 
-2. **アクセス確認**
-- フロントエンド: http://localhost:5173
-- バックエンドAPI: http://localhost:8000
-- Mailpit (メール確認): http://localhost:8025
-- Redis: localhost:6379
-
-### 開発用コマンド（Taskfile）
+2. **依存関係のインストール**
 ```bash
-# 利用可能なタスク一覧
-task --list
+# PHP依存関係
+composer install
 
-# Docker環境起動
-task up
-
-# Docker環境停止
-task down
-
-# ログ確認
-task logs
-
-# 再構築
-task rebuild
-
-# 開発環境起動（ログ表示付き）
-task dev
-
-# シェルアクセス
-task shell-backend   # Laravel
-task shell-frontend  # SvelteKit
-task shell-redis     # Redis CLI
-
-# Laravel関連
-task migrate         # マイグレーション実行
-task seed           # シーダー実行
-task test-backend   # テスト実行
+# JavaScript依存関係
+npm install
 ```
 
-詳細な手順については [dev-env.md](agent-context/dev-env.md) をご参照ください。
+3. **環境変数の設定**
+```bash
+# .envファイルの作成
+cp .env.example .env
+
+# アプリケーションキーの生成
+php artisan key:generate
+```
+
+4. **.envファイルの編集**
+`.env`ファイルを編集して、データベース接続情報などを設定してください：
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=mu_total
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+5. **データベースのセットアップ**
+```bash
+# マイグレーション実行
+php artisan migrate
+
+# シーダー実行（必要に応じて）
+php artisan db:seed
+```
+
+6. **開発サーバーの起動**
+```bash
+# Laravelサーバー起動
+php artisan serve
+
+# フロントエンドビルド（別ターミナル）
+npm run dev
+```
+
+7. **アクセス確認**
+- アプリケーション: http://localhost:8000
+
+### 開発用コマンド
+
+```bash
+# Laravelサーバー起動
+php artisan serve
+
+# フロントエンドビルド（開発モード）
+npm run dev
+
+# フロントエンドビルド（本番モード）
+npm run build
+
+# マイグレーション実行
+php artisan migrate
+
+# マイグレーションロールバック
+php artisan migrate:rollback
+
+# データベースリフレッシュ + シーダー実行
+php artisan migrate:fresh --seed
+
+# テスト実行
+php artisan test
+
+# Tinker起動
+php artisan tinker
+
+# キャッシュクリア
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+```
+
+## プロジェクト構造
+
+```
+mu-total/
+├── app/                    # アプリケーションコア
+├── bootstrap/              # フレームワーク起動ファイル
+├── config/                 # 設定ファイル
+├── database/              # マイグレーション・シーダー
+├── public/                # 公開ディレクトリ
+├── resources/             # ビュー・アセット
+├── routes/                # ルート定義
+├── storage/               # ログ・キャッシュ
+├── tests/                 # テスト
+└── agent-context/         # プロジェクトドキュメント
+```
 
 ## ドキュメント一覧
 
@@ -87,3 +137,7 @@ task test-backend   # テスト実行
 | [dev-env.md](agent-context/dev-env.md) | ローカル開発環境構築手順 |
 | [ci-cd.md](agent-context/ci-cd.md) | CI/CD構成と運用ルール |
 | [prompt-guide.md](agent-context/prompt-guide.md) | 生成AI活用のプロンプト集 |
+
+## ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。

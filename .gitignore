@@ -1,9 +1,30 @@
-# Environment files
+# Laravel
+*.log
 .env
-.env.local
+.env.backup
 .env.production
+.env.local
 .env.*.local
-
+.phpactor.json
+.phpunit.result.cache
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
 
 # OS Generated files
 .DS_Store
@@ -14,56 +35,13 @@
 ehthumbs.db
 Thumbs.db
 
-# Laravel backend
-backend/.env
-backend/.env.backup
-backend/.env.production
-backend/.phpunit.result.cache
-backend/Homestead.json
-backend/Homestead.yaml
-backend/auth.json
-backend/npm-debug.log
-backend/yarn-error.log
-backend/node_modules/
-backend/public/hot
-backend/public/storage
-backend/storage/*.key
-backend/vendor/
-backend/bootstrap/cache/
-
-# SvelteKit frontend
-frontend/.env
-frontend/.env.local
-frontend/.env.production.local
-frontend/node_modules/
-frontend/build/
-frontend/.svelte-kit/
-frontend/package-lock.json
-frontend/yarn.lock
-
-# Docker
-.docker/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
+# Coverage directory
 coverage/
 
 # Database
@@ -74,25 +52,10 @@ coverage/
 tmp/
 temp/
 
-# Cleanup and debugging files (should not be committed)
-scripts/fix-*.sh
-scripts/debug-*.sh
-scripts/nuclear-*.sh
-scripts/*-error.sh
-scripts/manage-build-cache.sh
-scripts/optimization-guide.sh
-
-# Docker experimental files
-**/Dockerfile.*.optimized
-**/Dockerfile.*.ultra
-**/Dockerfile.*.safe
-**/Dockerfile.*.emergency
-docker/base-images/
-
 # Backup files
 *.backup*
-docker-compose.*.backup*
 .env.*.backup*
 
-# Development docker-compose file
+# Docker
+.docker/
 docker-compose.dev.yml
